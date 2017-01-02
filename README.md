@@ -83,6 +83,3 @@ This snippet shows how to use the middleware
 ## Reference
 - [OAuth 2.0 RFC](https://tools.ietf.org/html/rfc6749)
 - [OAuth 2.0 Bearer Token Usage RFC](https://tools.ietf.org/html/rfc6750)
-
-## License
-[MIT](https://github.com/maxzerbini/oauth/blob/master/LICENSE)
