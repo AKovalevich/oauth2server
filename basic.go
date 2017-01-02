@@ -1,12 +1,14 @@
-package oauth
+package oauth2server
 
-import "gopkg.in/gin-gonic/gin.v1"
-import "strings"
-import "encoding/base64"
-import "errors"
+import (
+	"encoding/base64"
+	"errors"
+	"github.com/kataras/iris"
+	"strings"
+)
 
 // GetBasicAuthentication get username and password from Authorization header
-func GetBasicAuthentication(ctx *gin.Context) (username, password string, err error) {
+func GetBasicAuthentication(ctx *iris.Context) (username, password string, err error) {
 	if header := ctx.Request.Header.Get("Authorization"); header != "" {
 		if strings.ToLower(header[:6]) == "basic " {
 			// decode header value
@@ -23,17 +25,16 @@ func GetBasicAuthentication(ctx *gin.Context) (username, password string, err er
 	return "", "", nil
 }
 
-// Check Basic Autrhorization header credentials
-func CheckBasicAuthentication(username, password string, ctx *gin.Context) error {
+// CheckBasicAuthentication header credentials
+func CheckBasicAuthentication(username, password string, ctx *iris.Context) error {
 	u, p, err := GetBasicAuthentication(ctx)
 	if err != nil {
 		return err
-	} else {
-		if u != "" && p != "" {
-			if u != username && p != password {
-				return errors.New("Invalid credentials")
-			}
-		}
-		return nil
 	}
+	if u != "" && p != "" {
+		if u != username && p != password {
+			return errors.New("Invalid credentials")
+		}
+	}
+	return nil
 }

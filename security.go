@@ -1,4 +1,4 @@
-package oauth
+package oauth2server
 
 import (
 	"crypto/rc4"

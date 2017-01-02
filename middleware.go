@@ -1,4 +1,4 @@
-package oauth
+package oauth2server
 
 import (
 	"errors"
@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/gin-gonic/gin.v1"
+	"github.com/kataras/iris"
 )
 
-// BearerAuthentication middleware for Gin-Gonic
+// BearerAuthentication middleware for iris
 type BearerAuthentication struct {
 	secretKey string
 	provider  *TokenProvider
@@ -25,21 +25,21 @@ func NewBearerAuthentication(secretKey string, formatter TokenSecureFormatter) *
 	return ba
 }
 
-// Authorize is the OAuth 2.0 middleware for Gin-Gonic resource server.
+// Authorize is the OAuth 2.0 middleware for iris resource server.
 // Authorize creates a BearerAuthentication middlever and return the Authorize method.
-func Authorize(secretKey string, formatter TokenSecureFormatter) gin.HandlerFunc {
+func Authorize(secretKey string, formatter TokenSecureFormatter) iris.HandlerFunc {
 	return NewBearerAuthentication("mySecretKey-10101", nil).Authorize
 }
 
 // Authorize verifies the bearer token authorizing or not the request.
 // Token is retreived from the Authorization HTTP header that respects the format
 // Authorization: Bearer {access_token}
-func (ba *BearerAuthentication) Authorize(ctx *gin.Context) {
+func (ba *BearerAuthentication) Authorize(ctx *iris.Context) {
 	auth := ctx.Request.Header.Get("Authorization")
 	token, err := ba.checkAuthorizationHeader(auth)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, "Not authorized")
-		ctx.AbortWithStatus(401)
+		ctx.StopExecution()
 	} else {
 		ctx.Set("oauth.credential", token.Credential)
 		ctx.Set("oauth.claims", token.Claims)

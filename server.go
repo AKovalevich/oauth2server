@@ -1,11 +1,11 @@
-package oauth
+package oauth2server
 
 import (
 	"net/http"
 	"time"
 
+	"github.com/kataras/iris"
 	"github.com/satori/go.uuid"
-	"gopkg.in/gin-gonic/gin.v1"
 )
 
 const (
@@ -55,12 +55,12 @@ func NewOAuthBearerServer(secretKey string,
 }
 
 // UserCredentials manages password grant type requests
-func (s *OAuthBearerServer) UserCredentials(ctx *gin.Context) {
-	grantType := ctx.PostForm("grant_type")
+func (s *OAuthBearerServer) UserCredentials(ctx *iris.Context) {
+	grantType := ctx.PostValue("grant_type")
 	// grant_type password variables
-	username := ctx.PostForm("username")
-	password := ctx.PostForm("password")
-	scope := ctx.PostForm("scope")
+	username := ctx.PostValue("username")
+	password := ctx.PostValue("password")
+	scope := ctx.PostValue("scope")
 	if username == "" || password == "" {
 		// get clientId and secret from basic authorization header
 		var err error
@@ -71,17 +71,17 @@ func (s *OAuthBearerServer) UserCredentials(ctx *gin.Context) {
 		}
 	}
 	// grant_type refresh_token
-	refreshToken := ctx.PostForm("refresh_token")
+	refreshToken := ctx.PostValue("refresh_token")
 	code, resp := s.generateTokenResponse(grantType, username, password, refreshToken, scope)
 	ctx.JSON(code, resp)
 }
 
 // ClientCredentials manages client credentials grant type requests
-func (s *OAuthBearerServer) ClientCredentials(ctx *gin.Context) {
-	grantType := ctx.PostForm("grant_type")
+func (s *OAuthBearerServer) ClientCredentials(ctx *iris.Context) {
+	grantType := ctx.PostValue("grant_type")
 	// grant_type client_credentials variables
-	clientId := ctx.PostForm("client_id")
-	clientSecret := ctx.PostForm("client_secret")
+	clientId := ctx.PostValue("client_id")
+	clientSecret := ctx.PostValue("client_secret")
 	if clientId == "" || clientSecret == "" {
 		// get clientId and secret from basic authorization header
 		var err error
@@ -91,9 +91,9 @@ func (s *OAuthBearerServer) ClientCredentials(ctx *gin.Context) {
 			return
 		}
 	}
-	scope := ctx.PostForm("scope")
+	scope := ctx.PostValue("scope")
 	// grant_type refresh_token
-	refreshToken := ctx.PostForm("refresh_token")
+	refreshToken := ctx.PostValue("refresh_token")
 	code, resp := s.generateTokenResponse(grantType, clientId, clientSecret, refreshToken, scope)
 	ctx.JSON(code, resp)
 }
